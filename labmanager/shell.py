@@ -26,11 +26,12 @@ def main():
     parser.add_argument('--organization')
     parser.add_argument('--workspace', default='Main')
     parser.add_argument('--timeout', default=None)
+    parser.add_argument('--section', default='default')
     args = parser.parse_args()
 
-    password = getpass.getpass('password: ')
-    api_config = config.APIConfig(args.hostname, args.username, password,
-                                  args.organization, args.workspace)
+    api_config = config.load_config(parser, args)
+    if api_config.password is None:
+        api_config.password = getpass.getpass('password: ')
     client = api.create_soap_client(api_config)
     labmanager_api = api.LabManager(client)
     sh = LMShell(labmanager_api)
