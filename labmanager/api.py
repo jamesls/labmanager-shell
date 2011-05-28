@@ -33,3 +33,9 @@ class LabManager(object):
         workspace = self._client.service.ListConfigurations(
             self.WORKSPACE_CONFIGURATION)[0]
         return library + workspace
+
+    def show_configuration(self, config_id):
+        return self._client.service.GetConfiguration(config_id)
+
+    def list_machines(self, config_id):
+        return self._client.service.ListMachines(config_id)[0]

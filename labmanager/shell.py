@@ -10,6 +10,11 @@ DISPLAY_TYPE_MAP = {
     'isDeployed': 'deployed',
     'isPublic': 'public',
     'bucketName': 'bucket',
+    'internalIP': 'internal',
+    'externalIP': 'external',
+    'macAddress': 'MAC',
+    'OwnerFullName': 'owner',
+    'configID': 'config',
 }
 
 
@@ -17,7 +22,8 @@ class LMShell(cmd.Cmd):
     prompt = '(lmsh) '
     DONT_SHOW_COLUMN = ['autoDeleteInMilliSeconds', 'autoDeleteDateTime',
                         'description', 'mustBeFenced', 'fenceMode',
-                        'dateCreated']
+                        'dateCreated', 'DatastoreNameResidesOn',
+                        'HostNameDeployedOn', 'OwnerFullName']
 
     def __init__(self, lmapi, completekey='tab', stdin=None, stdout=None):
         cmd.Cmd.__init__(self, completekey, stdin, stdout)
@@ -42,6 +48,23 @@ class LMShell(cmd.Cmd):
         table.header([DISPLAY_TYPE_MAP.get(c, c) for c in columns])
         for config in configs:
             row = [getattr(config, col) for col in columns]
+            table.add_row(row)
+        print table.draw()
+
+    def do_show(self, line):
+        config = self._lmapi.show_configuration(line.strip())
+        print config
+
+    def do_machines(self, line):
+        machines = self._lmapi.list_machines(line.strip())
+        columns = [c for c in machines[0].__keylist__ if c not in
+                   self.DONT_SHOW_COLUMN]
+        table = Texttable(max_width=140)
+        table.set_deco(Texttable.HEADER | Texttable.VLINES)
+        table.set_cols_align(['l' for l in columns])
+        table.header([DISPLAY_TYPE_MAP.get(c, c) for c in columns])
+        for machine in machines:
+            row = [getattr(machine, col) for col in columns]
             table.add_row(row)
         print table.draw()
 
