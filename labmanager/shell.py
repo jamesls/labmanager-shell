@@ -24,7 +24,12 @@ class LMShell(cmd.Cmd):
         self._lmapi = lmapi
 
     def do_list(self, line):
-        configs = self._lmapi.list_library_configurations()[0]
+        if line.strip() == 'library':
+            configs = self._lmapi.list_library_configurations()
+        elif line.strip() == 'workspace':
+            configs = self._lmapi.list_workspace_configurations()
+        else:
+            configs = self._lmapi.list_all_configurations()
         if not configs:
             return
         columns = [c for c in configs[0].__keylist__ if c not in
