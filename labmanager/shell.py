@@ -59,6 +59,7 @@ def main():
     parser.add_argument('--workspace', default='Main')
     parser.add_argument('--timeout', default=None)
     parser.add_argument('--section', default='default')
+    parser.add_argument('onecmd', nargs='?', default=None)
     args = parser.parse_args()
 
     api_config = config.load_config(parser, args)
@@ -66,5 +67,8 @@ def main():
         api_config.password = getpass.getpass('password: ')
     client = api.create_soap_client(api_config)
     labmanager_api = api.LabManager(client)
-    sh = LMShell(labmanager_api)
-    sh.cmdloop()
+    lmsh = LMShell(labmanager_api)
+    if args.onecmd:
+        lmsh.onecmd(args.onecmd)
+    else:
+        lmsh.cmdloop()
