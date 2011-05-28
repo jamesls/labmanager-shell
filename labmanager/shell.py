@@ -33,7 +33,7 @@ class LMShell(cmd.Cmd):
         table = Texttable(max_width=120)
         table.set_deco(Texttable.HEADER | Texttable.VLINES)
         table.set_cols_align(['l' for l in columns])
-        table.set_cols_width([6, 30, 6, 8, 4, 10, 15])
+        table.set_cols_width([6, 30, 6, 8, 4, 15, 15])
         table.header([DISPLAY_TYPE_MAP.get(c, c) for c in columns])
         for config in configs:
             row = [getattr(config, col) for col in columns]
