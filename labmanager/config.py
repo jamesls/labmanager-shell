@@ -4,6 +4,7 @@ from urlparse import urljoin
 
 
 USER_CONFIG_FILE = os.path.expanduser('~/.lmshrc')
+SECRET_KEYS = ['password']
 
 
 def load_config(parser, args, cfgparser=None):
@@ -31,7 +32,7 @@ def load_config(parser, args, cfgparser=None):
         cfgparser = SafeConfigParser()
     full_config = _default_cmd_line_options(parser, args)
     cfg_values = load_config_from_config_file(cfgparser, args.section,
-                                              vars(args).keys())
+                                              vars(args).keys()+ SECRET_KEYS)
     cmd_line_cfg_values = _non_default_cmd_line_options(parser, args)
     full_config.update(cfg_values)
     full_config.update(cmd_line_cfg_values)
