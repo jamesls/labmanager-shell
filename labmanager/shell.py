@@ -1,6 +1,10 @@
+import argparse
+import getpass
 import cmd
 from texttable import Texttable
 
+from labmanager import api
+from labmanager import config
 
 # A mapping from the SOAP returned names
 # to the nicer to display names.
@@ -77,11 +81,7 @@ class LMShell(cmd.Cmd):
 
 
 
-def main():
-    from labmanager import api
-    from labmanager import config
-    import argparse
-    import getpass
+def get_cmd_line_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--hostname')
     parser.add_argument('--username')
@@ -90,6 +90,11 @@ def main():
     parser.add_argument('--timeout', default=None)
     parser.add_argument('--section', default='default')
     parser.add_argument('onecmd', nargs='?', default=None)
+    return parser
+
+
+def main():
+    parser = get_cmd_line_parser()
     args = parser.parse_args()
 
     api_config = config.load_config(parser, args)
