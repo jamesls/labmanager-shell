@@ -14,6 +14,7 @@ DISPLAY_TYPE_MAP = {
 
 
 class LMShell(cmd.Cmd):
+    prompt = '(lmsh) '
     DONT_SHOW_COLUMN = ['autoDeleteInMilliSeconds', 'autoDeleteDateTime',
                         'description', 'mustBeFenced', 'fenceMode',
                         'dateCreated']
@@ -40,6 +41,7 @@ class LMShell(cmd.Cmd):
         print table.draw()
 
     def do_EOF(self, line):
+        print
         return True
 
     def do_quit(self, line):
