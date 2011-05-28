@@ -1,7 +1,10 @@
 import argparse
 import getpass
 import cmd
+import sys
 from pprint import pprint
+import rlcompleter
+import readline
 
 from texttable import Texttable
 
@@ -43,9 +46,15 @@ class LMShell(cmd.Cmd):
         }
     }
 
-    def __init__(self, lmapi, completekey='tab', stdin=None, stdout=None):
-        cmd.Cmd.__init__(self, completekey, stdin, stdout)
+    def __init__(self, lmapi, stdin=None, stdout=None):
+        cmd.Cmd.__init__(self, '', stdin, stdout)
         self._lmapi = lmapi
+
+    def complete_list(self, text, line, begidx, endidx):
+        subcommands = ['library', 'workspace']
+        if not text:
+            return subcommands
+        return [c for c in subcommands if c.startswith(text)]
 
     def do_list(self, line):
         configs = self._get_configs(line.strip())
@@ -135,4 +144,9 @@ def main():
     if args.onecmd:
         lmsh.onecmd(args.onecmd)
     else:
+        readline.set_completer(lmsh.complete)
+        if sys.platform == 'darwin':
+            readline.parse_and_bind("bind ^I rl_complete")
+        else:
+            readline.parse_and_bind("tab: complete")
         lmsh.cmdloop()
