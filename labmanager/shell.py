@@ -1,6 +1,8 @@
 import argparse
 import getpass
 import cmd
+from pprint import pprint
+
 from texttable import Texttable
 
 from labmanager import api
@@ -24,53 +26,81 @@ DISPLAY_TYPE_MAP = {
 
 class LMShell(cmd.Cmd):
     prompt = '(lmsh) '
-    DONT_SHOW_COLUMN = ['autoDeleteInMilliSeconds', 'autoDeleteDateTime',
-                        'description', 'mustBeFenced', 'fenceMode',
-                        'dateCreated', 'DatastoreNameResidesOn',
-                        'HostNameDeployedOn', 'OwnerFullName']
+    LIST_CFG_COLUMNS = ['id', 'name', 'isDeployed', 'type', 'owner']
+    LIST_MACHINES_COLUMNS = ['id', 'name', 'internalIP', 'externalIP',
+                             'macAddress', 'memory', 'configID']
+    ENUM_TYPES = {
+        'type': {
+            1: 'workspace',
+            2: 'library',
+        },
+        'status': {
+            1: 'off',
+            2: 'on',
+            3: 'suspended',
+            4: 'stuck',
+            128: 'invalid',
+        }
+    }
 
     def __init__(self, lmapi, completekey='tab', stdin=None, stdout=None):
         cmd.Cmd.__init__(self, completekey, stdin, stdout)
         self._lmapi = lmapi
 
     def do_list(self, line):
-        if line.strip() == 'library':
-            configs = self._lmapi.list_library_configurations()
-        elif line.strip() == 'workspace':
-            configs = self._lmapi.list_workspace_configurations()
-        else:
-            configs = self._lmapi.list_all_configurations()
+        configs = self._get_configs(line.strip())
         if not configs:
             return
-        columns = [c for c in configs[0].__keylist__ if c not in
-                   self.DONT_SHOW_COLUMN]
+        columns = self.LIST_CFG_COLUMNS
 
         table = Texttable(max_width=120)
         table.set_deco(Texttable.HEADER | Texttable.VLINES)
         table.set_cols_align(['l' for l in columns])
-        table.set_cols_width([6, 30, 6, 8, 4, 15, 15])
+        table.set_cols_width([6, 30, 8, 10, 15])
         table.header([DISPLAY_TYPE_MAP.get(c, c) for c in columns])
-        for config in configs:
-            row = [getattr(config, col) for col in columns]
-            table.add_row(row)
+        rows = self._get_rows(configs, columns)
+        table.add_rows(rows, header=False)
         print table.draw()
+
+    def _get_configs(self, config_type):
+        if config_type == 'library':
+            configs = self._lmapi.list_library_configurations()
+        elif config_type == 'workspace':
+            configs = self._lmapi.list_workspace_configurations()
+        else:
+            configs = self._lmapi.list_all_configurations()
+        return configs
 
     def do_show(self, line):
         config = self._lmapi.show_configuration(line.strip())
-        print config
+        pprint(config)
 
     def do_machines(self, line):
         machines = self._lmapi.list_machines(line.strip())
-        columns = [c for c in machines[0].__keylist__ if c not in
-                   self.DONT_SHOW_COLUMN]
+        columns = self.LIST_MACHINES_COLUMNS
         table = Texttable(max_width=140)
         table.set_deco(Texttable.HEADER | Texttable.VLINES)
         table.set_cols_align(['l' for l in columns])
         table.header([DISPLAY_TYPE_MAP.get(c, c) for c in columns])
-        for machine in machines:
-            row = [getattr(machine, col) for col in columns]
-            table.add_row(row)
+        rows = self._get_rows(machines, columns)
+        table.add_rows(rows, header=False)
         print table.draw()
+
+    def _get_rows(self, objects, columns):
+        rows = []
+        for obj in objects:
+            row = []
+            for col in columns:
+                if col in self.ENUM_TYPES:
+                    # Using .get() here because sometimes
+                    # labmanager returned non documented
+                    # types/statuses/etc.
+                    row.append(self.ENUM_TYPES[col].get(
+                        obj[col], obj[col]))
+                else:
+                    row.append(obj[col])
+            rows.append(row)
+        return rows
 
     def do_EOF(self, line):
         print
@@ -78,7 +108,6 @@ class LMShell(cmd.Cmd):
 
     def do_quit(self, line):
         return True
-
 
 
 def get_cmd_line_parser():
