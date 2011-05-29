@@ -81,12 +81,14 @@ class LMShell(cmd.Cmd):
         return configs
 
     def do_show(self, line):
-        config = self._lmapi.show_configuration(line.strip())
-        pprint(config)
+        configuration = self._lmapi.show_configuration(line.strip())
+        pprint(configuration)
 
     def do_machines(self, line):
         machines = self._lmapi.list_machines(line.strip())
-        columns = self.LIST_MACHINES_COLUMNS
+        if not machines:
+            return
+        columns = self._get_machine_output_columns(machines)
         table = Texttable(max_width=140)
         table.set_deco(Texttable.HEADER | Texttable.VLINES)
         table.set_cols_align(['l' for l in columns])
@@ -94,6 +96,10 @@ class LMShell(cmd.Cmd):
         rows = self._get_rows(machines, columns)
         table.add_rows(rows, header=False)
         print table.draw()
+
+    def _get_machine_output_columns(self, machines):
+        return [c for c in self.LIST_MACHINES_COLUMNS if
+                c in machines[0]]
 
     def _get_rows(self, objects, columns):
         rows = []
@@ -106,10 +112,36 @@ class LMShell(cmd.Cmd):
                     # types/statuses/etc.
                     row.append(self.ENUM_TYPES[col].get(
                         obj[col], obj[col]))
-                else:
+                elif col in obj:
                     row.append(obj[col])
             rows.append(row)
         return rows
+
+    def do_undeploy(self, line):
+        config_id = line.strip()
+        print "Undeploying config..."
+        self._lmapi.undeploy_config(config_id)
+
+    def complete_deploy(self, text, line, begidx, endidx):
+        subcommands = ['unfenced', 'fenced']
+        if not text:
+            return subcommands
+        return [c for c in subcommands if c.startswith(text)]
+
+    def do_deploy(self, line):
+        args = line.split()
+        if len(args) != 2:
+            print "wrong number of args"
+        fence_mode = self._get_fence_mode_from(args[0])
+        config_id = args[1]
+        print "Deploying config..."
+        self._lmapi.deploy_config(config_id, fence_mode)
+
+    def _get_fence_mode_from(self, mode):
+        if mode == 'fenced':
+            return self._lmapi.FENCE_ALLOW_IN_AND_OUT
+        elif mode == 'unfenced':
+            return self._lmapi.NON_FENCED
 
     def do_EOF(self, line):
         print

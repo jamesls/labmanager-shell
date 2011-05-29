@@ -40,6 +40,11 @@ def single_dict(func):
 class LabManager(object):
     WORKSPACE_CONFIGURATION = 1
     LIBRARY_CONFIGURATIONS = 2
+    NON_FENCED = 1
+    FENCE_BLOCK_IN_AND_OUT = 2
+    FENCE_ALLOW_OUT_ONLY = 3
+    FENCE_ALLOW_IN_AND_OUT = 4
+
     def __init__(self, client):
         self._client = client
 
@@ -69,3 +74,9 @@ class LabManager(object):
     @list_of_dicts
     def list_machines(self, config_id):
         return self._client.service.ListMachines(config_id)[0]
+
+    def undeploy_config(self, config_id):
+        self._client.service.ConfigurationUndeploy(config_id)
+
+    def deploy_config(self, config_id, fence_mode):
+        self._client.service.ConfigurationDeploy(config_id, False, fence_mode)
