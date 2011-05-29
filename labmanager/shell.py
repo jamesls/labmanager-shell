@@ -120,7 +120,7 @@ class LMShell(cmd.Cmd):
     def do_undeploy(self, line):
         config_id = line.strip()
         print "Undeploying config..."
-        self._lmapi.undeploy_config(config_id)
+        self._lmapi.undeploy_configuration(config_id)
 
     def complete_deploy(self, text, line, begidx, endidx):
         subcommands = ['unfenced', 'fenced']
@@ -135,7 +135,7 @@ class LMShell(cmd.Cmd):
         fence_mode = self._get_fence_mode_from(args[0])
         config_id = args[1]
         print "Deploying config..."
-        self._lmapi.deploy_config(config_id, fence_mode)
+        self._lmapi.deploy_configuration(config_id, fence_mode)
 
     def _get_fence_mode_from(self, mode):
         if mode == 'fenced':

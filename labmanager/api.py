@@ -75,10 +75,10 @@ class LabManager(object):
     def list_machines(self, config_id):
         return self._client.service.ListMachines(config_id)[0]
 
-    def undeploy_config(self, config_id):
+    def undeploy_configuration(self, config_id):
         self._client.service.ConfigurationUndeploy(config_id)
 
-    def deploy_config(self, config_id, fence_mode):
+    def deploy_configuration(self, config_id, fence_mode):
         self._client.service.ConfigurationDeploy(config_id, False, fence_mode)
 
     def checkout_configuration(self, config_id, name):
