@@ -80,3 +80,20 @@ class LabManager(object):
 
     def deploy_config(self, config_id, fence_mode):
         self._client.service.ConfigurationDeploy(config_id, False, fence_mode)
+
+    def checkout_configuration(self, config_id, name):
+        # This is likely not to be terribly useful.  If you keep
+        # the default workspace of "Main", you'll run into errors
+        # that look something like:
+        # "Expecting single row, got multiple rows for: SELECT * FROM
+        # BucketWithParent WHERE  name = N'Main'"
+        # You can either bribe the labmanager admins to create a unique
+        # workspace name for you, or I can try to make this work
+        # with the internal API.
+
+        # Return type is an int so we don't need to do any custom
+        # conversions.
+        return self._client.service.ConfigurationCheckout(config_id, name)
+
+    def delete_configuration(self, config_id):
+        self._client.service.ConfigurationDelete(config_id)

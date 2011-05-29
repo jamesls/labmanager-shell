@@ -143,6 +143,21 @@ class LMShell(cmd.Cmd):
         elif mode == 'unfenced':
             return self._lmapi.NON_FENCED
 
+    def do_checkout(self, line):
+        args = line.split()
+        if len(args) != 2:
+            print "wrong number of args"
+        config_id = args[0]
+        workspace_name = args[1]
+        print "Checking out config..."
+        checkout_id = self._lmapi.checkout_configuration(config_id,
+                                                         workspace_name)
+        print "Config ID of checked out configuration:", checkout_id
+
+    def do_delete(self, line):
+        print "Deleting config..."
+        self._lmapi.delete_configuration(line.strip())
+
     def do_EOF(self, line):
         print
         return True
