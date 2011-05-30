@@ -1,4 +1,5 @@
 from suds.client import Client
+from suds.sudsobject import asdict
 
 
 def create_soap_client(config):
@@ -17,7 +18,7 @@ def suds_to_dict_type(suds_type):
     # sudsobject is magic.  Let's give the user
     # something that's simpler to work with.  Hopefully
     # they don't miss the types.
-    return dict(list(iter(suds_type)))
+    return asdict(suds_type)
 
 
 def list_of_dicts(func):
