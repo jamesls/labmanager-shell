@@ -3,6 +3,7 @@ import getpass
 import cmd
 import sys
 from pprint import pprint
+import textwrap
 import rlcompleter
 import readline
 
@@ -59,13 +60,15 @@ class LMShell(cmd.Cmd):
     def do_list(self, line):
         """
         List configurations.
+        Syntax:
 
         list [library | workspace]
-        There are several subcommands that can optionally by used.
+
         List all library and workspace configurations:
 
             list
 
+        There are several subcommands that can optionally be used.
         List only library configurations:
 
             list library
@@ -99,10 +102,27 @@ class LMShell(cmd.Cmd):
         return configs
 
     def do_show(self, line):
+        """
+        Show all information for a single configuration.
+        Syntax:
+
+        show <configid>
+
+        The config ID can be obtained from the 'list' command.
+        """
         configuration = self._lmapi.show_configuration(line.strip())
         pprint(configuration)
 
     def do_machines(self, line):
+        """
+        List all machines in a configuration.
+        Syntax:
+
+        machines <configid>
+
+        The config ID can be obtained from the 'list' command.
+
+        """
         machines = self._lmapi.list_machines(line.strip())
         if not machines:
             return
@@ -136,6 +156,13 @@ class LMShell(cmd.Cmd):
         return rows
 
     def do_undeploy(self, line):
+        """
+        Undeploying a configuration.
+        Syntax:
+
+        undeploy <configid>
+
+        """
         config_id = line.strip()
         print "Undeploying config..."
         self._lmapi.undeploy_configuration(config_id)
@@ -147,6 +174,17 @@ class LMShell(cmd.Cmd):
         return [c for c in subcommands if c.startswith(text)]
 
     def do_deploy(self, line):
+        """
+        Deploy a configuration in a workspace.
+        Syntax:
+
+        deploy <fenced|unfenced> <configid>
+
+        After the configuration has been deployed, you
+        can use the 'machines' command to get a list of
+        the IP addresses of the machines.
+
+        """
         args = line.split()
         if len(args) != 2:
             print "wrong number of args"
@@ -162,6 +200,30 @@ class LMShell(cmd.Cmd):
             return self._lmapi.NON_FENCED
 
     def do_checkout(self, line):
+        """
+        Checkout a configuration from the library to the workspace.
+        Syntax:
+
+        checkout <configid> <workspacename>
+
+        Where the configid is the ID of the configuration as it
+        currently exists in the library, and workspacename is the
+        name you'd like the configuration to have in the workspace.
+        After a configuration has been checked out, it can then
+        be deployed (though keep in mind the newly checked out
+        workspace configuration will have a different configid that
+        you'll need to use to deploy it.
+
+        Due to bug's in Lab Manager 4.x, this command will fail
+        if multiple organizations have the same workspace name
+        (this is likely if your workspace name is 'Main').  It
+        might be possible to work around this using the internal
+        SOAP api, but this is currently not implemented.
+
+        Another way to work around this is to create a unique
+        workspace name (you will need admin privileges to do so).
+
+        """
         args = line.split()
         if len(args) != 2:
             print "wrong number of args"
@@ -173,6 +235,13 @@ class LMShell(cmd.Cmd):
         print "Config ID of checked out configuration:", checkout_id
 
     def do_delete(self, line):
+        """
+        Delete a configuration.
+        Syntax:
+
+        delete <configid>
+
+        """
         print "Deleting config..."
         self._lmapi.delete_configuration(line.strip())
 
@@ -182,6 +251,24 @@ class LMShell(cmd.Cmd):
 
     def do_quit(self, line):
         return True
+
+    def do_help(self, line):
+        if line:
+            try:
+                func = getattr(self, 'help_' + line)
+            except AttributeError:
+                try:
+                    doc = getattr(self, 'do_' + line).__doc__
+                    if doc:
+                        self.stdout.write("%s\n" % textwrap.dedent(doc))
+                        return
+                except AttributeError:
+                    pass
+                self.stdout.write("%s\n" % (self.nohelp % (line,)))
+                return
+            func()
+        else:
+            cmd.Cmd.do_help(self, line)
 
 
 def get_cmd_line_parser():
