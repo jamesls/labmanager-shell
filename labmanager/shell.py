@@ -57,6 +57,24 @@ class LMShell(cmd.Cmd):
         return [c for c in subcommands if c.startswith(text)]
 
     def do_list(self, line):
+        """
+        List configurations.
+
+        list [library | workspace]
+        There are several subcommands that can optionally by used.
+        List all library and workspace configurations:
+
+            list
+
+        List only library configurations:
+
+            list library
+
+        List only workspace configurations:
+
+            list workspace
+
+        """
         configs = self._get_configs(line.strip())
         if not configs:
             return
@@ -133,7 +151,7 @@ class LMShell(cmd.Cmd):
         if len(args) != 2:
             print "wrong number of args"
         fence_mode = self._get_fence_mode_from(args[0])
-        config_id = args[1]
+        config_id = args[0]
         print "Deploying config..."
         self._lmapi.deploy_configuration(config_id, fence_mode)
 
@@ -168,12 +186,21 @@ class LMShell(cmd.Cmd):
 
 def get_cmd_line_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--hostname')
-    parser.add_argument('--username')
-    parser.add_argument('--organization')
-    parser.add_argument('--workspace', default='Main')
-    parser.add_argument('--timeout', default=None)
-    parser.add_argument('--section', default='default')
+    parser.add_argument('--hostname', help="The hostname of the "
+                        "Lab Manager server.")
+    parser.add_argument('--username', help="The Lab Manager username.")
+    parser.add_argument('--organization', help="The organization name that "
+                        "contains the objects on which you want to perform "
+                        "operations.")
+    parser.add_argument('--workspace', default='Main', help="The workspace "
+                        "name that contains the objects on which you want to "
+                        "perform operations.")
+    parser.add_argument('--timeout', default=None, help="The default timeout "
+                        "to use with all SOAP calls.  If this is not "
+                        "specified, then no timeout will be used.")
+    parser.add_argument('--section', default='default', help="What section "
+                        "name to load config values from (if loading values "
+                        "from a config file).")
     parser.add_argument('onecmd', nargs='?', default=None)
     return parser
 
