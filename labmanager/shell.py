@@ -6,11 +6,14 @@ from pprint import pprint
 import textwrap
 import rlcompleter
 import readline
+import logging
 
 from texttable import Texttable
+import suds
 
 from labmanager import api
 from labmanager import config
+from labmanager.loghandler import NullHandler
 
 # A mapping from the SOAP returned names
 # to the nicer to display names.
@@ -26,6 +29,16 @@ DISPLAY_TYPE_MAP = {
     'OwnerFullName': 'owner',
     'configID': 'config',
 }
+SOAP_API_EXCEPTION = (
+    suds.MethodNotFound,
+    suds.PortNotFound,
+    suds.ServiceNotFound,
+    suds.TypeNotFound,
+    suds.BuildError,
+    suds.SoapHeadersNotPermitted,
+    suds.WebFault,
+    suds.transport.TransportError,
+)
 
 
 class LMShell(cmd.Cmd):
@@ -270,6 +283,26 @@ class LMShell(cmd.Cmd):
         else:
             cmd.Cmd.do_help(self, line)
 
+    def onecmd(self, line):
+        try:
+            return cmd.Cmd.onecmd(self, line)
+        except SOAP_API_EXCEPTION, e:
+            sys.stderr.write("ERROR: %s\n" % e)
+            return ReturnCode(1)
+
+    def postcmd(self, stop, line):
+        if isinstance(stop, ReturnCode):
+            return None
+        return stop
+
+
+class ReturnCode(object):
+    def __init__(self, return_code):
+        self.return_code = return_code
+
+    def __nonzero__(self):
+        return False
+
 
 def get_cmd_line_parser():
     parser = argparse.ArgumentParser()
@@ -299,11 +332,15 @@ def main():
     api_config = config.load_config(parser, args)
     if api_config.password is None:
         api_config.password = getpass.getpass('password: ')
+    logging.getLogger('suds').addHandler(NullHandler())
     client = api.create_soap_client(api_config)
     labmanager_api = api.LabManager(client)
     lmsh = LMShell(labmanager_api)
     if args.onecmd:
-        lmsh.onecmd(args.onecmd)
+        result = lmsh.onecmd(args.onecmd)
+        if isinstance(result, ReturnCode):
+            sys.exit(result.return_code)
+        sys.exit(0)
     else:
         readline.set_completer(lmsh.complete)
         if sys.platform == 'darwin':
