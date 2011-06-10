@@ -201,8 +201,9 @@ class LMShell(cmd.Cmd):
         args = line.split()
         if len(args) != 2:
             print "wrong number of args"
+            return
         fence_mode = self._get_fence_mode_from(args[0])
-        config_id = args[0]
+        config_id = args[1]
         print "Deploying config..."
         self._lmapi.deploy_configuration(config_id, fence_mode)
 
