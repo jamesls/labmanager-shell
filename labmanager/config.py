@@ -36,9 +36,12 @@ def load_config(parser, args, cfgparser=None):
     cmd_line_cfg_values = _non_default_cmd_line_options(parser, args)
     full_config.update(cfg_values)
     full_config.update(cmd_line_cfg_values)
+    timeout = full_config.get('timeout')
+    if timeout:
+        timeout = int(timeout)
     return APIConfig(full_config['hostname'], full_config['username'],
                      full_config.get('password'), full_config['organization'],
-                     full_config['workspace'], full_config.get('timeout'))
+                     full_config['workspace'], timeout)
 
 
 def load_config_from_config_file(cfgparser, section, valid_keys):

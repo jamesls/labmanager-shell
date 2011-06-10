@@ -316,9 +316,10 @@ def get_cmd_line_parser():
     parser.add_argument('--workspace', default='Main', help="The workspace "
                         "name that contains the objects on which you want to "
                         "perform operations.")
-    parser.add_argument('--timeout', default=None, help="The default timeout "
-                        "to use with all SOAP calls.  If this is not "
-                        "specified, then no timeout will be used.")
+    parser.add_argument('--timeout', default=None, type=int,
+                        help="The default timeout  to use with all SOAP "
+                        "calls.  If this is not specified, then no timeout "
+                        "will be used.")
     parser.add_argument('--section', default='default', help="What section "
                         "name to load config values from (if loading values "
                         "from a config file).")
