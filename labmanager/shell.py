@@ -323,7 +323,7 @@ def get_cmd_line_parser():
     parser.add_argument('--section', default='default', help="What section "
                         "name to load config values from (if loading values "
                         "from a config file).")
-    parser.add_argument('onecmd', nargs='?', default=None)
+    parser.add_argument('onecmd', nargs='*', default=None)
     return parser
 
 
@@ -339,7 +339,7 @@ def main():
     labmanager_api = api.LabManager(client)
     lmsh = LMShell(labmanager_api)
     if args.onecmd:
-        result = lmsh.onecmd(args.onecmd)
+        result = lmsh.onecmd(' '.join(args.onecmd))
         if isinstance(result, ReturnCode):
             sys.exit(result.return_code)
         sys.exit(0)
