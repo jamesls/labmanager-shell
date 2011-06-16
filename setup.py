@@ -12,7 +12,7 @@ setup(
         'console_scripts': ['lmsh = labmanager.shell:main'],
     },
     classifiers=[
-        'Development Status :: 3 - Alpha'
+        'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
     ],
     install_requires=[
