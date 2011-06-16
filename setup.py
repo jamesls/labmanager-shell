@@ -7,7 +7,7 @@ setup(
     license='BSD',
     author='James Saryerwinnie',
     author_email='jlsnpi@gmail.com',
-    modules=find_packages(),
+    packages=find_packages(),
     entry_points={
         'console_scripts': ['lmsh = labmanager.shell:main'],
     },
