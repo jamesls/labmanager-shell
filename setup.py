@@ -7,7 +7,7 @@ setup(
     version='0.1',
     description="Command line interface to Lab Manager SOAP API",
     long_description=open(os.path.join(os.path.dirname(__file__),
-                                       'README.rst')).read()
+                                       'README.rst')).read(),
     license='BSD',
     author='James Saryerwinnie',
     author_email='jlsnpi@gmail.com',
