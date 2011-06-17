@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='lmsh',
-    version='0.1.1',
+    version='0.1.2',
     description="Command line interface to Lab Manager SOAP API",
     long_description=open(os.path.join(os.path.dirname(__file__),
                                        'README.rst')).read(),
