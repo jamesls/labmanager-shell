@@ -1,6 +1,5 @@
 import os
 from ConfigParser import SafeConfigParser
-from urlparse import urljoin
 
 
 USER_CONFIG_FILE = os.path.expanduser('~/.lmshrc')
