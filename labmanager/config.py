@@ -11,7 +11,8 @@ def load_config(parser, args, cfgparser=None):
 
     The loading process works like this:
 
-        - first a config file is looked for
+        - the default command line options are loaded
+        - next a config file is looked for
         - if it's found, then we load the config file.
         - the there's no section specified in the args,
           the default section is loaded.
@@ -66,6 +67,7 @@ def load_config_from_config_file(cfgparser, section, valid_keys):
 def _default_cmd_line_options(parser, args):
     return dict([(k, v) for k, v in vars(args).items()
                  if parser.get_default(k) == v])
+
 
 def _non_default_cmd_line_options(parser, args):
     # Return anything that the user explicitly specifies

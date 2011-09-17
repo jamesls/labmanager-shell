@@ -7,6 +7,7 @@ import textwrap
 import rlcompleter
 import readline
 import logging
+import ConfigParser
 
 from texttable import Texttable
 import suds
@@ -331,7 +332,14 @@ def main():
     parser = get_cmd_line_parser()
     args = parser.parse_args()
 
-    api_config = config.load_config(parser, args)
+    config_parser = ConfigParser.SafeConfigParser()
+    # If the user explicitly specifies a section but it does
+    # not exist, we should let them know and exit.
+    if not args.section == parser.get_default('section') \
+            and not config_parser.has_section(args.section):
+        sys.stderr.write("section does not exist: %s\n" % args.section)
+        sys.exit(1)
+    api_config = config.load_config(parser, args, config_parser)
     if api_config.password is None:
         api_config.password = getpass.getpass('password: ')
     logging.getLogger('suds').addHandler(NullHandler())
