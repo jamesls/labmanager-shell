@@ -324,6 +324,8 @@ def get_cmd_line_parser():
     parser.add_argument('--section', default='default', help="What section "
                         "name to load config values from (if loading values "
                         "from a config file).")
+    parser.add_argument('-l', '--list-sections', action="store_true", help="Show "
+                        "available sections in the .lmshrc file.")
     parser.add_argument('onecmd', nargs='*', default=None)
     return parser
 
@@ -335,11 +337,14 @@ def main():
     config_parser = ConfigParser.SafeConfigParser()
     # If the user explicitly specifies a section but it does
     # not exist, we should let them know and exit.
+    api_config = config.load_config(parser, args, config_parser)
     if not args.section == parser.get_default('section') \
             and not config_parser.has_section(args.section):
         sys.stderr.write("section does not exist: %s\n" % args.section)
         sys.exit(1)
-    api_config = config.load_config(parser, args, config_parser)
+    if args.list_sections:
+        print '\n'.join(config_parser.sections())
+        sys.exit(0)
     if api_config.password is None:
         api_config.password = getpass.getpass('password: ')
     logging.getLogger('suds').addHandler(NullHandler())
