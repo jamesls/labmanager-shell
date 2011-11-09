@@ -358,8 +358,5 @@ def main():
         sys.exit(0)
     else:
         readline.set_completer(lmsh.complete)
-        if sys.platform == 'darwin':
-            readline.parse_and_bind("bind ^I rl_complete")
-        else:
-            readline.parse_and_bind("tab: complete")
+        readline.parse_and_bind("tab: complete")
         lmsh.cmdloop()
