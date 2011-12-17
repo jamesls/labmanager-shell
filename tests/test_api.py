@@ -67,6 +67,11 @@ class TestLabManagerAPI(unittest.TestCase):
         self.lmapi.perform_machine_action(self.lmapi.POWER_ON, 54)
         self.client.service.MachinePerformAction.assert_called_with(54, 1)
 
+    def test_get_machine(self):
+        self.client.service.GetMachine.return_value = \
+            create_suds_type(foo='bar')
+        self.assertEqual(self.lmapi.get_machine(1), {'foo': 'bar'})
+
 
 if __name__ == '__main__':
     unittest.main()
