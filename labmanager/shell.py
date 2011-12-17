@@ -8,6 +8,7 @@ import rlcompleter
 import readline
 import logging
 import ConfigParser
+import urllib2
 
 from texttable import Texttable
 import suds
@@ -348,7 +349,11 @@ def main():
     if api_config.password is None:
         api_config.password = getpass.getpass('password: ')
     logging.getLogger('suds').addHandler(NullHandler())
-    client = api.create_soap_client(api_config)
+    try:
+        client = api.create_soap_client(api_config)
+    except urllib2.URLError, e:
+        sys.stderr.write("could not connect to server: %s\n" % e)
+        sys.exit(1)
     labmanager_api = api.LabManager(client)
     lmsh = LMShell(labmanager_api)
     if args.onecmd:
