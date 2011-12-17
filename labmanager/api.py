@@ -45,6 +45,16 @@ class LabManager(object):
     FENCE_BLOCK_IN_AND_OUT = 2
     FENCE_ALLOW_OUT_ONLY = 3
     FENCE_ALLOW_IN_AND_OUT = 4
+    # These are the actions that can be used with
+    # perform_machine_action
+    POWER_ON = 1
+    POWER_OFF = 2
+    SUSPEND = 3
+    RESUME = 4
+    RESET = 5
+    SNAPSHOT = 6
+    REVERT = 7
+    SHUTDOWN = 8
 
     def __init__(self, client):
         self._client = client
@@ -98,3 +108,17 @@ class LabManager(object):
 
     def delete_configuration(self, config_id):
         self._client.service.ConfigurationDelete(config_id)
+
+    def perform_machine_action(self, action, machine_id):
+        """Perform an action on a machine.
+
+        @param action: The action to perform.  Use one of the
+            class attributes POWER_ON, POWER_OFF,
+            SUSPEND, RESUME, RESET, SNAPSHOT, REVERT,
+            SHUTDOWN.
+        @param machine_id: The id of the machine.
+
+        """
+        # This is not a typo, the pdf docs are wrong, the args
+        # are actually switched.
+        self._client.service.MachinePerformAction(machine_id, action)
