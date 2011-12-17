@@ -77,6 +77,12 @@ class TestLabManagerAPI(unittest.TestCase):
         self.assertEqual(self.lmapi.get_machine_by_name(1234, 'machine_name'),
                          {'foo': 'bar'})
 
+    def test_show_configuration_by_name(self):
+        self.client.service.GetSingleConfigurationByName.return_value = \
+            create_suds_type(foo='bar')
+        self.assertEqual(self.lmapi.show_configuration_by_name(
+            'configuration_name'), {'foo': 'bar'})
+
 
 if __name__ == '__main__':
     unittest.main()

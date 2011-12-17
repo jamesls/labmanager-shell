@@ -82,6 +82,13 @@ class LabManager(object):
     def show_configuration(self, config_id):
         return self._client.service.GetConfiguration(config_id)
 
+    @single_dict
+    def show_configuration_by_name(self, name):
+        # I am assuming that by calling this API your'e looking
+        # for a specific configuration by name, not all configurations
+        # matching this name.
+        return self._client.service.GetSingleConfigurationByName(name)
+
     @list_of_dicts
     def list_machines(self, config_id):
         return self._client.service.ListMachines(config_id)[0]
