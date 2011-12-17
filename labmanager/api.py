@@ -1,6 +1,24 @@
 from suds.client import Client
 from suds.sudsobject import asdict
 
+# TODO: These are the API calls not yet implemented.
+# ConfigurationCapture
+# ConfigurationClone
+# ConfigurationSetPublicPrivate
+# GetCurrentOrganizationName
+# GetCurrentWorkspaceName
+
+# These are the API calls that I don't plan on supporting.
+# GetConfigurationByName
+# LiveLink
+# SetCurrentOrganizationByName
+# SetCurrentWorkspaceByName
+# ConfigurationPerformAction - doesn't work. Well, the API
+#   call succeeds, but it doesn't actually do anything.
+#   I can go into the gui and perform actions on the
+#   configuration, so the feature is working, but there
+#   seems to be an issue with trying to do this via the API.
+
 
 def create_soap_client(config):
     # config is an instance of config.APIConfig
