@@ -90,6 +90,10 @@ class LabManager(object):
     def get_machine(self, machine_id):
         return self._client.service.GetMachine(machine_id)
 
+    @single_dict
+    def get_machine_by_name(self, config_id, name):
+        return self._client.service.GetMachineByName(config_id, name)
+
     def undeploy_configuration(self, config_id):
         self._client.service.ConfigurationUndeploy(config_id)
 
