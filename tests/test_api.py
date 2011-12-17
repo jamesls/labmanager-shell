@@ -59,8 +59,7 @@ class TestLabManagerAPI(unittest.TestCase):
 
     def test_deploy_configuration(self):
         self.lmapi.deploy_configuration(54, self.lmapi.FENCE_ALLOW_IN_AND_OUT)
-        # TODO: This is not a complete tests.
-        self.client.service.ConfigurationDeploy(
+        self.client.service.ConfigurationDeploy.assert_called_with(
             54, False, self.lmapi.FENCE_ALLOW_IN_AND_OUT)
 
     def test_machine_perform_action(self):
